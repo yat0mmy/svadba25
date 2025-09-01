@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
+  <title>wedding</title>
+  <style>
+    body {
+      margin: 0;
+      background: linear-gradient(135deg, #111 0%, #333 100%);
+      overflow: hidden;
+      height: 100vh;
+    }
+    .video-card {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 100%;
+      height: 100%;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+    video {
+      position: absolute;
+      width: 90vw;
+      height: 90vh;
+      object-fit: cover;
+      border-radius: 16px;
+      box-shadow: 0 0 40px rgba(0, 0, 0, 0.6);
+
+      opacity: 0;
+      transform: scale(0.97);
+      transition: opacity 1.2s ease, transform 1.5s ease;
+    }
+    video.active {
+      opacity: 1;
+      transform: scale(1);
+      z-index: 2;
+    }
+    video.prev {
+      opacity: 0;
+      transform: scale(1.05);
+      z-index: 1;
+    }
+  </style>
+</head>
+<body>
+  <main>
+    <section class="video-card">
+      <video id="v0" src="https://raw.githubusercontent.com/yat0mmy/svadba25/main/videos/video1.mp4" muted playsinline></video>
+      <video id="v1" src="https://raw.githubusercontent.com/yat0mmy/svadba25/main/videos/video2.mp4" muted playsinline></video>
+      <video id="v2" src="https://raw.githubusercontent.com/yat0mmy/svadba25/main/videos/video3.mp4" muted playsinline></video>
+      <video id="v3" src="https://raw.githubusercontent.com/yat0mmy/svadba25/main/videos/video4.mp4" muted playsinline></video>
+    </section>
+  </main>
+
+  <script>
+    const videos = [
+      document.getElementById('v0'),
+      document.getElementById('v1'),
+      document.getElementById('v2'),
+      document.getElementById('v3')
+    ];
+
+    async function playSequentially(index = 0, prevIndex = null) {
+      if (index >= videos.length) return;
+
+      const video = videos[index];
+
+      if (prevIndex !== null) {
+        const prevVideo = videos[prevIndex];
+        prevVideo.classList.remove('active');
+        prevVideo.classList.add('prev');
+      }
+
+      video.classList.remove('prev');
+      video.classList.add('active');
+
+      try {
+        await video.play();
+      } catch (err) {
+        video.muted = true;
+        try { await video.play(); } catch {}
+      }
+
+      video.addEventListener('ended', () => {
+        if (index + 1 < videos.length) {
+          playSequentially(index + 1, index);
+        }
+      }, { once: true });
+    }
+
+    window.addEventListener('load', () => {
+      playSequentially(0);
+    });
+  </script>
+</body>
+</html>
